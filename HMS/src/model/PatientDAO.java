@@ -1,0 +1,227 @@
+package model;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import model.DbConnection;
+/*This class is used for performing the CRUD operations for the patient*/
+public class PatientDAO {
+	ArrayList<PatientBean> pList = new ArrayList<PatientBean>();
+	/* Retrieving the details of one outPatient with his/her OPDNo */
+	public ArrayList<PatientBean> viewOneOutPatient(String oPDNo) {
+
+		Connection conn = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+			conn = DbConnection.getConnection();
+			String sql = "SELECT * FROM TBL_P2_T5_PATIENT where OPDNO='" + oPDNo
+					+ "'";
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				PatientBean pb = new PatientBean();
+				pb.setOPDNo(rs.getInt("OPDNO"));
+				pb.setName(rs.getString("FIRSTNAME"));
+				pb.setAddress(rs.getString("ADDRESS"));
+				pb.setGender(rs.getString("GENDER"));
+				pb.setDeptNo(rs.getString("SPECIALIZATION"));
+
+				pList.add(pb);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (rs != null) {
+					rs.close();
+				}
+				if (pst != null) {
+					pst.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (Exception e) {
+				System.out.println(" Clsoing exception" + e);
+			}
+		}
+		return pList;
+	}
+	/*  Retrieving the details of one InPatient with his/her OPDNo */
+	public ArrayList<PatientBean> viewOneInPatient(String oPDNo) {
+
+		Connection conn = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+			conn = DbConnection.getConnection();
+			String sql = "SELECT DISTINCT i.OPDNO, p.FIRSTNAME,p.ADDRESS,p.GENDER,p.DEPTNO " +
+					"FROM TBL_P2_T5_INPATIENT i," +
+					"TBL_P2_T5_PATIENT p WHERE i.OPDNO=p.OPDNO and i.OPDNo='" + oPDNo+"'";
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				PatientBean pb = new PatientBean();
+				pb.setOPDNo(rs.getInt("OPDNO"));
+				pb.setName(rs.getString("FIRSTNAME"));
+				pb.setAddress(rs.getString("ADDRESS"));
+				pb.setGender(rs.getString("GENDER"));
+				pb.setDeptNo(rs.getString("SPECIALIZATION"));
+
+				pList.add(pb);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (rs != null) {
+					rs.close();
+				}
+				if (pst != null) {
+					pst.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (Exception e) {
+				System.out.println(" Clsoing exception" + e);
+			}
+		}
+		return pList;
+	}
+	/*  Retrieving the details of All Patients with his/her OPDNo */
+	public ArrayList<PatientBean> viewAllPatient() {
+
+		Connection conn = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+			conn = DbConnection.getConnection();
+			String sql = "SELECT * FROM TBL_P2_T5_PATIENT";
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				PatientBean pb = new PatientBean();
+				pb.setOPDNo(rs.getInt("OPDNO"));
+				pb.setName(rs.getString("FIRSTNAME"));
+				pb.setAddress(rs.getString("ADDRESS"));
+				pb.setGender(rs.getString("GENDER"));
+				pb.setDeptNo(rs.getString("SPECIALIZATION"));
+
+				pList.add(pb);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (rs != null) {
+					rs.close();
+				}
+				if (pst != null) {
+					pst.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (Exception e) {
+				System.out.println(" Clsoing exception" + e);
+			}
+		}
+		return pList;
+	}
+	/*  Retrieving the details of All InPatient with his/her OPDNo */
+	public ArrayList<PatientBean> viewAllInPatient() {
+
+		Connection conn = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+			conn = DbConnection.getConnection();
+			String sql="SELECT DISTINCT i.OPDNO, p.FIRSTNAME,p.ADDRESS,p.GENDER,P.SPECIALIZATION " +
+					"FROM TBL_P2_T5_INPATIENT i, TBL_P2_T5_PATIENT p WHERE i.OPDNO=p.OPDNO"; 
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				PatientBean pb = new PatientBean();
+				pb.setOPDNo(rs.getInt("OPDNO"));
+				pb.setName(rs.getString("FIRSTNAME"));
+				pb.setAddress(rs.getString("ADDRESS"));
+				pb.setGender(rs.getString("GENDER"));
+				pb.setDeptNo(rs.getString("SPECIALIZATION"));
+
+				pList.add(pb);
+			}
+			rs.close();
+			pst.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (rs != null) {
+					rs.close();
+				}
+				if (pst != null) {
+					pst.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (Exception e) {
+				System.out.println(" Clsoing exception" + e);
+			}
+		}
+		return pList;
+	}
+	/* Update the Status of OutPatient to InPatient by inserting   his/her OPDNo in InPatient table*/
+	public void updatePatient(String oPDNo1) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = DbConnection.getConnection();
+			String query = "insert into TBL_P2_T5_INPATIENT(OPDNO) values(?)";
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, oPDNo1);
+			pstmt.executeUpdate();
+			pstmt.close();
+		} catch (Exception e) {
+			System.out.println(" Exception" + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (Exception e) {
+				System.out.println(" Clsoing exception" + e);
+			}
+		}
+	}
+}

@@ -1,0 +1,354 @@
+package model;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+
+
+public class PatientDetailsDAO {
+	
+	/* method to generate opd Number after successful registration.
+	 * It accepts no parameters and returns an object of type class PatientBean1 
+	*/
+	public PatientBean1 displayOpdNo() {
+		
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs=null;
+
+		try {
+           
+			conn = DbConnection.getConnection();
+		
+			String sql = "SELECT MAX(OPDNO) FROM P2_TEAM5_PATIENT " +
+					"ORDER BY OPDNO DESC ";
+			ps = conn.prepareStatement(sql);
+			rs=ps.executeQuery();
+		
+		}
+			catch(Exception e)
+			{
+				System.out.println("printing not done");
+			}
+		 try{	
+			while(rs.next())
+			{ PatientBean1 p3=new PatientBean1();
+			System.out.println("Opd no is"+rs.getInt("MAX(OPDNO)"));
+		p3.setOpdNumber(rs.getInt("MAX(OPDNO)")) ;
+			
+				return p3;
+			}
+			
+			 rs.close();
+			ps.close();
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs!=null)
+				{
+					rs.close();
+				}
+				if (ps != null)
+
+				{
+					ps.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+
+			} catch (Exception e) {
+				System.out.println(" Closing exception" + e);
+			}
+
+		}
+		return null;
+
+	}
+	
+	/*method to insert details of patient from User Interface to database
+	 * It accepts object of class PatientBean1 and returns nothing.
+*/	public void insertPatientDetails(PatientBean1 p) {
+
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			conn = DbConnection.getConnection();
+			String sql = "INSERT INTO " +
+					"P2_TEAM5_PATIENT VALUES " +
+					"(SEQ_OPDNO_LP14.NEXTVAL,?,?,?," +
+					"TO_DATE(?,'DD-MON-YYYY'),?,?,?,?,?,?,?,?,?)";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, p.getFirstName());
+			pstmt.setString(2, p.getMiddleName());
+			pstmt.setString(3, p.getLastName());
+			pstmt.setString(4, p.getDateOfBirth());
+			pstmt.setString(5, p.getGender());
+			pstmt.setString(6, p.getBloodGroup());
+			pstmt.setString(7, p.getFatherOrSpouseName());
+			pstmt.setString(8, p.getAddress());
+			pstmt.setString(9, p.getContactNo());
+			pstmt.setString(10, p.getEmailId());
+			pstmt.setString(11, p.getIsVisitedEarlier());
+			pstmt.setString(12, p.getDisease());
+			pstmt.setString(13, p.getTypeOfDoctor());
+			int count = pstmt.executeUpdate(); // variable to store no:of rows inserted
+			pstmt.close();
+			System.out.println("Inserted count" + count);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt!= null)
+
+				{
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+
+			} catch (Exception e) {
+				System.out.println(" Closing exception" + e);
+			}}
+
+		}
+	
+	/*method to display all the patients details
+	 * It accepts nothing and returns an array list of type class PatientBean1
+*/	
+	public static ArrayList<PatientBean1> viewAllPatients() {
+
+		ArrayList<PatientBean1> patient = new ArrayList<PatientBean1>();
+		PreparedStatement pst = null;
+		Connection con = null;
+		ResultSet rs = null;
+		
+		DbConnection dataBase = new DbConnection();
+		try {
+			con = dataBase.getConnection();
+			String sql = "SELECT * FROM P2_TEAM5_PATIENT ORDER BY OPDNO";
+			pst = con.prepareStatement(sql);
+			rs = pst.executeQuery();
+			
+			while (rs.next()) {
+				
+				PatientBean1 patients = new PatientBean1();
+				int opdn = rs.getInt("OPDNO");
+				
+				String firstName = rs.getString("FIRSTNAME");
+				String middleName = rs.getString("MIDNAME");
+				String lastName = rs.getString("LASTNAME");
+				String dob = rs.getString("DOB");
+				String gender = rs.getString("GENDER");
+				String bg = rs.getString("BLOODGROUP");
+				String fsName = rs.getString("FATHERORSPOUSENAME");
+				String address = rs.getString("ADDRESS");
+				String phno = rs.getString("CONTACTNO");
+				String mailId = rs.getString("MAILID");
+				String disease = rs.getString("DISEASE");
+				String tod = rs.getString("TYPEOFDOCTOR");
+				String isVisited = rs.getString("ISVISITEDEARLIER");
+				
+				patients.setOpdNumber(opdn);
+				patients.setFirstName(firstName);
+				patients.setMiddleName(middleName);
+				patients.setLastName(lastName);
+				patients.setDateOfBirth(dob);
+				patients.setBloodGroup(bg);
+				patients.setGender(gender);
+				patients.setFatherOrSpouseName(fsName);
+				patients.setAddress(address);
+				patients.setContactNo(phno);
+				patients.setEmailId(mailId);
+				patients.setDisease(disease);
+				patients.setTypeOfDoctor(tod);
+				patients.setIsVisitedEarlier(isVisited);
+				
+				patient.add(patients);
+				
+				
+			}
+			rs.close();
+			pst.close();
+		} catch (Exception e) {
+			System.out.println("Query not executed");
+		}
+
+		return patient;
+	}
+
+	/* method to display patient's details referring opd number
+	 * It accepts opd number and returns an object of class PatientBean1
+*/	public PatientBean1 displayPatient(int opdn) {
+		PatientBean1 patients = new PatientBean1();
+		PreparedStatement pst = null;
+		PreparedStatement pst1 = null;
+		Connection con = null;
+		ResultSet rs = null;
+		
+		int flag=0 ; // variable to set flag according to the condition 
+		DbConnection dataBase = new DbConnection();
+		try {
+			con = dataBase.getConnection();
+			
+			String sql = "UPDATE  P2_TEAM5_PATIENT SET ISVISITEDEARLIER='Y' WHERE OPDNO=?";
+			pst1 = con.prepareStatement(sql);
+			
+			pst1.setInt(1, opdn);
+			pst1.executeUpdate();
+			String sql1 = "SELECT * FROM P2_TEAM5_PATIENT  WHERE OPDNO=?";
+
+			pst = con.prepareStatement(sql1);
+			pst.setInt(1, opdn);
+			
+			rs = pst.executeQuery();
+			
+			
+
+			if (rs.next()==true) {
+				
+				
+				
+				flag = 1;
+				String firstName = rs.getString("FIRSTNAME");
+				String middleName = rs.getString("MIDNAME");
+				String lastName = rs.getString("LASTNAME");
+				String dob = rs.getString("DOB");
+				String gender = rs.getString("GENDER");
+				String bg = rs.getString("BLOODGROUP");
+				String fsName = rs.getString("FATHERORSPOUSENAME");
+				String address = rs.getString("ADDRESS");
+				String phno = rs.getString("CONTACTNO");
+				String mailId = rs.getString("MAILID");
+				String disease = rs.getString("DISEASE");
+				String tod = rs.getString("TYPEOFDOCTOR");
+				String isVisited = rs.getString("ISVISITEDEARLIER");
+				System.out.println(isVisited);
+				patients.setOpdNumber(opdn);
+				patients.setFirstName(firstName);
+				patients.setMiddleName(middleName);
+				patients.setLastName(lastName);
+				patients.setDateOfBirth(dob);
+				patients.setBloodGroup(bg);
+				patients.setGender(gender);
+				patients.setFatherOrSpouseName(fsName);
+				patients.setAddress(address);
+				patients.setContactNo(phno);
+				patients.setEmailId(mailId);
+				patients.setDisease(disease);
+				patients.setTypeOfDoctor(tod);
+				patients.setIsVisitedEarlier(isVisited);
+
+			}
+			
+			rs.close();
+			pst.close();
+			
+		} catch (Exception e) {
+			System.out.println("Query not executed");
+			e.printStackTrace();
+		}
+		if (flag == 0) {
+			patients = null;
+		}
+
+		return patients;
+
+	}
+
+	/*
+	 * Method to delete patient details.
+	 * It accepts object of class PatientBean1 and returns nothing.
+	 */
+	public void deletePatientDetails(PatientBean1 s1) {
+		
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		try {
+			
+			conn = DbConnection.getConnection();
+		
+			String sql = "DELETE FROM P2_TEAM5_PATIENT WHERE OPDNO=?";
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, s1.getOpdNumber());
+			int count = ps.executeUpdate();
+			ps.close();
+			System.out.println("Deleted count" + count);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+
+				{
+					ps.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+
+			} catch (Exception e) {
+				System.out.println(" Closing exception" + e);
+			}
+
+		}
+
+	}
+	
+	
+	/*
+	 * method to validate the FOM login.
+	 * It accepts user name and password from User Interface and returns 
+	 * a flag after validating with database.
+	 */
+	public int checkFomLogin(String userName, String password) {
+		
+		PreparedStatement pst = null;
+		Connection con = null;
+		ResultSet rs = null;
+		 int flag=0; // a variable to set flag according to the condition.
+		String uName,pwd;
+		 try
+		 {
+			
+		con=DbConnection.getConnection();
+		 String sql="SELECT * FROM TBL_P2_TEAM5_USER";
+		 
+		 pst=con.prepareStatement(sql);
+		 rs=pst.executeQuery();
+		 
+		if(rs.next() ){
+			  uName = rs.getString("USERID");
+				pwd = rs.getString("PASSWORD"); 
+				if(userName.equals(uName)){
+					if(password.equals(pwd))
+					{
+						flag=1;
+					}
+					
+				}
+		 }	
+		
+		 rs.close();
+			pst.close();
+			
+		} 
+		
+		catch (Exception e) {
+			System.out.println("Query not executed");
+		}
+		 
+		return flag;
+	}
+	
+
+}

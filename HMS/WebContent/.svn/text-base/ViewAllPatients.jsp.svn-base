@@ -1,0 +1,79 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ page isErrorPage="false" errorPage="/errorHandler.jsp" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>View All patients</title>
+</head>
+<body>
+
+
+
+<%@page import="java.util.*; import model.*; import controller.*" %>
+
+<form name="viewall">
+<center>
+<table cellpadding="10" border="1" style="background-color: olive;">
+	<tr>
+		<th>OPD NO</th>
+		<th>First Name</th>
+		<th>Middle Name</th>
+		<th>Last Name</th>
+		<th>Date Of Birth</th>
+		<th>Gender</th>
+		<th>Blood Group</th>
+		<th>Father Or Spouse Name</th>
+		<th>Address</th>
+		<th>Contact Number</th>
+		<th>e-mail Id</th>
+		<th>Is Visited Earlier</th>
+		<th>Disease</th>
+		<th>Type Of Doctor</th>
+		
+	</tr>
+<%
+	ArrayList<PatientBean1> lst = (ArrayList<PatientBean1>)request.getAttribute("pList");
+Iterator<PatientBean1> it = lst.iterator();
+while(it.hasNext()){
+	
+		PatientBean1 patient = it.next();
+%>
+<tr>
+	
+	<td><%=patient.getOpdNumber()%></td>
+
+	<td><%=patient.getFirstName()%></td>
+	<td><%=patient.getMiddleName()%></td>
+
+	<td><%=patient.getLastName()%></td>
+
+	<td><%=patient.getDateOfBirth()%></td>
+
+	<td><%=patient.getGender()%></td>
+
+	<td><%=patient.getBloodGroup()%></td>
+
+	<td><%=patient.getFatherOrSpouseName()%></td>
+
+	<td><%=patient.getAddress()%></td>
+
+	<td><%=patient.getContactNo()%></td>
+
+	<td><%=patient.getEmailId()%></td>
+
+	<td><%=patient.getDisease()%></td>
+
+	
+
+	<td><%=patient.getIsVisitedEarlier()%></td>
+	<td><%=patient.getTypeOfDoctor()%></td>
+</tr>	
+ <%} %>
+ </table>
+ </center>
+ </form>
+ 
+</body>
+</html>
